@@ -1,22 +1,33 @@
 #include <iostream>
-#include <thread>
-#include <chrono>
+#include "servicemanager/service_manager.h"
 
-void checkDatabase() {
-    while (true) {
-        std::cout << "Checking database for updates...\n";
-        // Simulate database query and processing
-        std::this_thread::sleep_for(std::chrono::seconds(10));
-    }
+using namespace ThreadPoolNamespace;
+using namespace ServiceNamespace;
+
+// Define services
+void databaseService() {
+    std::cout << "[DB Service] Checking database for updates...\n";
+}
+
+void healthCheckService() {
+    std::cout << "[Health Service] Checking animal health status...\n";
 }
 
 int main() {
-    std::thread worker(checkDatabase);
-    worker.detach();  // Let it run in the background
+    ThreadPool pool(std::thread::hardware_concurrency());
+    ServiceManager serviceManager(pool);
 
-    // Main application loop
+    // Register services with their execution intervals
+    serviceManager.addService(databaseService, 10);
+    serviceManager.addService(healthCheckService, 5);
+
+    // Start all registered services
+    serviceManager.start();
+
+    // Keep the main program running
     while (true) {
-        std::cout << "Main application running...\n";
-        std::this_thread::sleep_for(std::chrono::seconds(5));
+        std::this_thread::sleep_for(std::chrono::seconds(1));
     }
+
+    return 0;
 }
