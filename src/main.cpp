@@ -1,15 +1,23 @@
 #include <iostream>
 #include "servicemanager/service_manager.h"
+#include "threadpool/threadpool.h"
+#include "databasemanager/database_manager.h"
+
+using namespace Database_n;
+using namespace std;
 
 using namespace ThreadPoolNamespace;
 using namespace ServiceNamespace;
 
-// Define services
 void databaseService() {
+    DatabaseManager& db = DatabaseManager::getInstance(); // ✅ Correct usage
+    db.executeQuery("SELECT * FROM Animals;");
     std::cout << "[DB Service] Checking database for updates...\n";
 }
 
 void healthCheckService() {
+    DatabaseManager& db = DatabaseManager::getInstance(); // ✅ Any service can access DB
+    db.executeQuery("UPDATE Animals SET health_status='Good' WHERE id=1;");
     std::cout << "[Health Service] Checking animal health status...\n";
 }
 
